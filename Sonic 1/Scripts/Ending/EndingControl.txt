@@ -16,6 +16,8 @@ private alias 1 : ENDINGCONTROL_FADEIN
 private alias 2 : ENDINGCONTROL_MAIN
 private alias 3 : ENDINGCONTROL_NONE
 
+private alias  5 : ENDINGPOSE_HOLDEMERALDS
+
 // Player Aliases
 private alias object.xpos : player.xpos
 private alias object.ypos : player.ypos
@@ -138,41 +140,51 @@ event ObjectUpdate
 								// Normal Ending Frames
 								
 								switch stage.playerListPos
-								case PLAYER_SONIC_ALONE
-								case PLAYER_SONIC_AND_TAILS
+								case PLAYER_SONIC_A
+								case PLAYER_SONIC_TAILS_A
 									object[currentPlayer].frame = 0
 									break
 									
-								case PLAYER_TAILS_ALONE
+								case PLAYER_TAILS_A
 									object[currentPlayer].frame = 13
 									break
 									
-								case PLAYER_KNUX_ALONE
+								case PLAYER_KNUCKLES_A
 									object[currentPlayer].frame = 24
 									break
+#platform: USE_ORIGINS
+								case PLAYER_AMY_A
+									object[currentPlayer].frame = 45
+									break
+#endplatform
 									
 								end switch
 							else
 								// Good Ending Frames
 								
 								switch stage.playerListPos
-								case PLAYER_SONIC_ALONE
-								case PLAYER_SONIC_AND_TAILS
+								case PLAYER_SONIC_A
+								case PLAYER_SONIC_TAILS_A
 									object[currentPlayer].frame = 4
 									break
 									
-								case PLAYER_TAILS_ALONE
+								case PLAYER_TAILS_A
 									object[currentPlayer].frame = 16
 									break
 									
-								case PLAYER_KNUX_ALONE
+								case PLAYER_KNUCKLES_A
 									object[currentPlayer].frame = 27
 									break
-									
+#platform: USE_ORIGINS
+								case PLAYER_AMY_A
+									object[currentPlayer].frame += 45
+									object[currentPlayer].frame += 4
+									break
+#endplatform
 								end switch
 								
 								// Put them in the Good Ending state too, looks like the Emeralds are starting to do something
-								object[currentPlayer].state = 5
+								object[currentPlayer].state = ENDINGPOSE_HOLDEMERALDS
 							end if
 
 							object[currentPlayer].logoPos = 224

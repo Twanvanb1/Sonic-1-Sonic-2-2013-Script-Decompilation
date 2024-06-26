@@ -115,7 +115,19 @@ event ObjectUpdate
 				arrayPos1 = options.saveSlot
 				arrayPos1 <<= 3
 				if stage.player2Enabled == true
-					saveRAM[arrayPos1] = 3
+#platform: USE_STANDALONE
+					saveRAM[arrayPos1] = PLAYER_SONIC_TAILS_A
+#endplatform
+#platform: USE_ORIGINS
+					switch stage.playerListPos
+					case PLAYER_SONIC_A
+						saveRAM[arrayPos1] = PLAYER_SONIC_TAILS
+						break
+					case PLAYER_AMY_A
+						saveRAM[arrayPos1] = PLAYER_AMY_TAILS
+						break
+					end switch
+#endplatform
 				else
 					saveRAM[arrayPos1] = stage.playerListPos
 				end if
@@ -126,8 +138,13 @@ event ObjectUpdate
 				arrayPos1++
 				saveRAM[arrayPos1] = player.scoreBonus
 				arrayPos1++
+				
+				// Bug Details:
+				// This is missing the check for if your save file is already past the next act
+				// This means the save file's act will be overwritten to Final Zone, even if you're on a Complete save file...
 				saveRAM[arrayPos1] = stage.listPos
 				saveRAM[arrayPos1]++
+				
 				arrayPos1++
 				saveRAM[arrayPos1] = specialStage.emeralds
 				arrayPos1++

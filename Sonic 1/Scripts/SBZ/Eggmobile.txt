@@ -48,6 +48,10 @@ private alias object.direction : player.direction
 private alias object.gravity : player.gravity
 private alias object.animation : player.animation
 private alias object.controlMode : player.controlMode
+private alias object.value40 : player.hitboxLeft
+private alias object.value38 : player.hitboxTop
+private alias object.value41 : player.hitboxRight
+private alias object.value39 : player.hitboxBottom
 
 // Game Modes
 private alias 0 : MODE_NOSAVE
@@ -128,7 +132,7 @@ event ObjectUpdate
 		object.xpos += object.xvel
 		object.ypos += object.yvel
 		temp0 = stage.newXBoundary2
-		temp0 += 212
+		temp0 += 212 // (screen.xcenter with the standard screen width of 424)
 		temp0 <<= 16
 		if object.xpos >= temp0
 #platform: USE_ORIGINS
@@ -275,7 +279,13 @@ event ObjectUpdate
 
 	if object.state == EGGMOBILE_FLEE
 		foreach (GROUP_PLAYERS, currentPlayer, ACTIVE_ENTITIES)
+#platform: USE_STANDALONE
 			BoxCollisionTest(C_TOUCH, object.entityPos, -20, -16, 20, 16, currentPlayer, C_BOX, C_BOX, C_BOX, C_BOX)
+#endplatform
+#platform: USE_ORIGINS
+			BoxCollisionTest(C_TOUCH, object.entityPos, -20, -16, 20, 16, currentPlayer, player[currentPlayer].hitboxLeft, player[currentPlayer].hitboxTop, player[currentPlayer].hitboxRight, player[currentPlayer].hitboxBottom)
+#endplatform
+
 			if checkResult == true
 				CallFunction(Player_CheckHit)
 				if checkResult == true

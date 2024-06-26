@@ -249,7 +249,9 @@ event ObjectUpdate
 
 #platform: USE_ORIGINS
 		// They forgot to add the ability to pause in Debug Mode...
-	
+		
+		temp0 = false
+		
 		if keyDown[1].left == true
 			object.xpos -= object.yvel
 			temp0 = true
@@ -287,7 +289,7 @@ event ObjectUpdate
 			if DebugMode_ExitTimer == 0
 				// Exit Debug Mode
 				
-				if stage.playerListPos == PLAYER_TAILS_ALONE
+				if stage.playerListPos == PLAYER_TAILS_A
 					object.type = TypeName[Tails Object]
 				else
 					object.type = TypeName[Player Object]
@@ -296,7 +298,12 @@ event ObjectUpdate
 				player.speed = 0
 				player.xvel = 0
 				player.yvel = 0
+#platform: USE_STANDALONE
 				player.state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+				player.state = Player_State_Air_NoDropDash
+#endplatform
 				player.animation = ANI_WALKING
 				player.animationSpeed = 0
 				player.frame = 0
@@ -306,7 +313,6 @@ event ObjectUpdate
 				player.interaction = true
 				player.tileCollisions = true
 				player.visible = true
-
 			end if
 		else
 			if keyPress[0].buttonA == true
@@ -384,14 +390,11 @@ end event
 event ObjectStartup
 	LoadSpriteSheet("Global/Display.gif")
 
-	// Appears as just a white square in this game, but it would be Sonic's (otherwise unused) CD life icon if using S1 2013's Global Display sheet
-	// (This frame data is the same as S1's and wasn't updated, in other words)
+	// In S1 this would be Sonic's life icon from Sonic CD, here it's blank (or in Origins Plus' case, part of Amy's Act Finish name sprite)
 	SpriteFrame(-8, -8, 16, 16, 188, 239)
-
+	
+	// Reset the tables
 	DebugMode_ObjCount = 0
-
-	// Fill the table with placeholder values
-	// - Not needed on first run, but needed when refreshing a new scene in order to clear the table
 	temp0 = 0
 	while temp0 < 256
 		SetTableValue(TypeName[Debug Mode], temp0, DebugMode_TypesTable)
@@ -415,7 +418,7 @@ end event
 
 event RSDKLoad
 	LoadSpriteSheet("Global/Display.gif")
-	SpriteFrame(-8, -8, 16, 16, 188, 239) // just a white square but hey, if that's what the object does then it's fine
+	SpriteFrame(-8, -8, 16, 16, 188, 239) // See above
 	
 	SetVariableAlias(ALIAS_VAR_PROPVAL, "unused")
 end event

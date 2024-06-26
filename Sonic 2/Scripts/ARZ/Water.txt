@@ -23,6 +23,7 @@ private alias object.value2 : airBubble.targetPlayer
 // CountdownBubble Aliases
 private alias object.value1 : countdownBubble.drawPos.x
 private alias object.value2 : countdownBubble.drawPos.y
+private alias object.value3 : countdownBubble.drawScreenID // new to Origins.
 
 // Player Aliases
 private alias object.type : player.type
@@ -42,6 +43,7 @@ private alias object.value1  : player.timer
 private alias object.value3  : player.drownTimer
 private alias object.value4  : player.drownLevel
 private alias object.value7  : player.invincibleTimer
+private alias object.value16 : player.isSidekick
 private alias object.value18 : player.sortedDrawOrder
 private alias object.value20 : player.topSpeed
 private alias object.value21 : player.acceleration
@@ -54,6 +56,9 @@ private alias object.value28 : player.jumpCap
 private alias object.value37 : player.shield
 
 private alias 1 : SUPERSTATE_SUPER
+
+private alias 30 : SLOT_VSGAME
+private alias object.value7 : object.waterSlotID
 
 // Death Event Aliases
 private alias object.value4 : object.timeOver
@@ -160,7 +165,12 @@ private function Water_SpawnCountDownBubble
 	CreateTempObject(TypeName[Countdown Bubble], temp0, player[currentPlayer].xpos, player[currentPlayer].ypos)
 	object[tempObjectPos].drawOrder = 5
 	object[tempObjectPos].yvel = -0x8800
+#platform: USE_STANDALONE
 	countdownBubble[tempObjectPos].drawPos.y = currentPlayer // this is odd... this is drawPos.y, not "targetPlayer", likely a leftover from AirBubble spawning
+#endplatform
+#platform: USE_ORIGINS
+	countdownBubble[tempObjectPos].drawScreenID = currentPlayer
+#endplatform
 	if player[currentPlayer].direction == FACING_RIGHT
 		object[tempObjectPos].xpos += 0x60000
 	else
@@ -173,7 +183,13 @@ end function
 
 
 private function Water_ResetDrownMusic
-	if currentPlayer == 0
+#platform: USE_STANDALONE
+	if currentPlayer == false
+#endplatform
+#platform: USE_ORIGINS
+	if player[currentPlayer].isSidekick == false
+#endplatform
+
 		arrayPos0 = Water_waterSlotID
 		arrayPos0 += currentPlayer
 		if player[currentPlayer].type != TypeName[Death Event]
@@ -208,7 +224,7 @@ event ObjectUpdate
 	arrayPos0 = object.entityPos
 	CallFunction(object.proccessActEffects)
 
-	// ARZ water doesn't really move, but the functionality for it is here anyways just in case ig
+	// ARZ water doesn't really move, but the functionality for it is here anyway just in case ig
 	if object.ypos < stage.newWaterLevel
 		object.ypos += 0x10000
 	end if
@@ -231,6 +247,7 @@ event ObjectUpdate
 			end if
 		end if
 #endplatform
+		
 		if player[currentPlayer].gravityStrength == 0x3800
 			CheckNotEqual(player[currentPlayer].type, TypeName[Debug Mode])
 			temp0 = checkResult
@@ -316,7 +333,12 @@ event ObjectUpdate
 					CallFunction(Water_SpawnSmallAirBubble)
 					player[currentPlayer].drownTimer++
 					if player[currentPlayer].drownTimer == 360
-						if currentPlayer == 0
+#platform: USE_STANDALONE
+						if currentPlayer == false
+#endplatform
+#platform: USE_ORIGINS
+						if player[currentPlayer].isSidekick == false
+#endplatform
 							PlaySfx(SfxName[Drown Alert], false)
 						end if
 						player[currentPlayer].drownLevel++
@@ -327,7 +349,12 @@ event ObjectUpdate
 					CallFunction(Water_SpawnSmallAirBubble)
 					player[currentPlayer].drownTimer++
 					if player[currentPlayer].drownTimer == 660
-						if currentPlayer == 0
+#platform: USE_STANDALONE
+						if currentPlayer == false
+#endplatform
+#platform: USE_ORIGINS
+						if player[currentPlayer].isSidekick == false
+#endplatform
 							PlaySfx(SfxName[Drown Alert], false)
 						end if
 						player[currentPlayer].drownLevel++
@@ -338,7 +365,12 @@ event ObjectUpdate
 					CallFunction(Water_SpawnSmallAirBubble)
 					player[currentPlayer].drownTimer++
 					if player[currentPlayer].drownTimer == 960
-						if currentPlayer == 0
+#platform: USE_STANDALONE
+						if currentPlayer == false
+#endplatform
+#platform: USE_ORIGINS
+						if player[currentPlayer].isSidekick == false
+#endplatform
 							PlaySfx(SfxName[Drown Alert], false)
 						end if
 						player[currentPlayer].drownLevel++
@@ -349,7 +381,12 @@ event ObjectUpdate
 					CallFunction(Water_SpawnSmallAirBubble)
 					player[currentPlayer].drownTimer++
 					if player[currentPlayer].drownTimer == 1080
-						if currentPlayer == 0
+#platform: USE_STANDALONE
+						if currentPlayer == false
+#endplatform
+#platform: USE_ORIGINS
+						if player[currentPlayer].isSidekick == false
+#endplatform
 							object.nextTrackID = music.currentTrack
 							PlayMusic(TRACK_DROWNING)
 						end if
@@ -415,10 +452,18 @@ event ObjectUpdate
 					player[currentPlayer].drownTimer++
 					if player[currentPlayer].drownTimer == 1800
 						if player[currentPlayer].state != Player_State_Death
-							if currentPlayer == 0
-								stage.timeEnabled = false
-								camera[0].enabled = false
+#platform: USE_ORIGINS
+							if options.vsMode == false
+#endplatform
+								if currentPlayer == 0
+									stage.timeEnabled = false
+									camera[0].enabled = false
+								end if
+#platform: USE_ORIGINS
+							else
+								camera[currentPlayer].style = CAMERASTYLE_STATIC
 							end if
+#endplatform
 							player[currentPlayer].state = Player_State_Drown
 							player[currentPlayer].animation = ANI_DROWNING
 							player[currentPlayer].speed = 0
@@ -492,7 +537,7 @@ event ObjectUpdate
 
 #platform: USE_STANDALONE
 					// Fixes a bug where jumping at the surface of the water will set your velocity too high
-					// Also yep this fix isn't in Origins, this is taken from the Sega Forever releases of the game
+					// Also yep this fix isn't in Origins, this is taken from the Sega Forever version of the game
 					if player[currentPlayer].animation == ANI_JUMPING
 						if player[currentPlayer].timer > 0
 							if player[currentPlayer].yvel < -0x68000
@@ -562,7 +607,7 @@ event ObjectStartup
 		object[arrayPos0].drawOrder = 5
 		object[arrayPos0].inkEffect = INK_ALPHA
 		object[arrayPos0].alpha = 0xA0
-		if credits.screen == 0 // (This check will always pass, see below)
+		if credits.screen == 0 // This check will always pass, see below
 			stage.newWaterLevel = object[arrayPos0].ypos
 		else
 			// Leftover from S1 LZ Water, there aren't any in-game credits in this game so this doesn't really matter...
@@ -588,7 +633,7 @@ event ObjectStartup
 			arrayPos0 = Water_waterSlotID
 			object[arrayPos0].ypos = stage.newWaterLevel
 		else
-			if credits.screen == 0 // This check will always pass too since this game doesn't have in-game credits, just a S1 leftover
+			if credits.screen == 0 // This check will always pass, see above
 				stage.waterState = 0
 			end if
 		end if
@@ -608,7 +653,7 @@ event ObjectStartup
 			player[currentPlayer].airAcceleration >>= 1
 			player[currentPlayer].airDeceleration >>= 1
 			player[currentPlayer].gravityStrength = 0x1000
-			if stage.playerListPos == PLAYER_KNUX_ALONE
+			if stage.playerListPos == PLAYER_KNUCKLES_A
 				player[currentPlayer].jumpStrength = 0x30000
 			else
 				player[currentPlayer].jumpStrength = 0x38000
@@ -620,8 +665,14 @@ event ObjectStartup
 		end if
 	next
 	
+#platform: USE_ORIGINS
+	if options.vsMode == true
+		object[SLOT_VSGAME].waterSlotID = Water_waterSlotID
+	end if
+#endplatform
+	
 	// The only ARZ object to actually use this sheet...
-	// All the other water-related objects (besides Water Splash) use "CPZ/Objects2.gif" instead...
+	// All the other water-related objects in this zone (besides Water Splash) use "CPZ/Objects2.gif" instead...
 	LoadSpriteSheet("ARZ/Objects2.gif")
 	SpriteFrame(0, -7, 256, 16, 0, 0)
 	SpriteFrame(0, -7, 256, 16, 0, 16)

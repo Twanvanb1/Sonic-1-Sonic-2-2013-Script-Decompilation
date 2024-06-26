@@ -29,6 +29,7 @@ private alias object.tileCollisions : player.tileCollisions
 // Button Aliases
 private alias object.value0 : PushButton.stood
 
+
 // ========================
 // Function Declarations
 // ========================
@@ -152,7 +153,12 @@ event ObjectUpdate
 				CallFunction(JunctionWheel_HandleWheelMove)
 				if player[currentPlayer].speed == -0x1000
 					if object.rotation == 0x180
+#platform: USE_STANDALONE
 						player[currentPlayer].state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+						player[currentPlayer].state = Player_State_Air_NoDropDash
+#endplatform
 						player[currentPlayer].animation = ANI_JUMPING
 						player[currentPlayer].tileCollisions = true
 						player[currentPlayer].speed = 0
@@ -164,7 +170,12 @@ event ObjectUpdate
 
 					if object.spinDir == 1
 						if object.rotation == 0x11C
+#platform: USE_STANDALONE
 							player[currentPlayer].state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+							player[currentPlayer].state = Player_State_Air_NoDropDash
+#endplatform
 							player[currentPlayer].animation = ANI_JUMPING
 							player[currentPlayer].tileCollisions = true
 							player[currentPlayer].speed = 0x80000
@@ -191,6 +202,7 @@ event ObjectStartup
 	LoadSpriteSheet("SBZ/Objects.gif")
 	SpriteFrame(-56, -24, 48, 48, 1, 261)
 	SpriteFrame(-56, -56, 112, 112, 399, 284)
+	
 	SetTableValue(TypeName[Junction Wheel], DebugMode_ObjCount, DebugMode_TypesTable)
 	SetTableValue(JunctionWheel_DebugDraw, DebugMode_ObjCount, DebugMode_DrawTable)
 	SetTableValue(JunctionWheel_DebugSpawn, DebugMode_ObjCount, DebugMode_SpawnTable)

@@ -6,15 +6,7 @@
 // ----------------------------------
 
 // ========================
-// Aliases
-// ========================
-
-// ========================
-// Static Values
-// ========================
-
-// ========================
-// Tables
+// Events
 // ========================
 
 event ObjectDraw
@@ -32,6 +24,10 @@ event ObjectStartup
 	next
 end event
 
+
+// ========================
+// Editor Events
+// ========================
 
 event RSDKDraw
 	DrawSprite(object.propertyValue)

@@ -71,10 +71,22 @@ private table TransportTube_transportDelays2
 end table
 
 private table TransportTube_nodeFlagsTable
-	2, 1, 0, 0, -1, 3, 0, 0, 4, -2, 0, 0, -3, -4, 0, 0
-	-5, -5, 0, 0, 7, 6, 0, 0, -7, -6, 0, 0, 8, 9, 0, 0
-	-8, -9, 0, 0, 11, 10, 0, 0, 12, 0, 0, 0, -11, -10, 0, 0
-	-12, 0, 0, 0, 0, 13, 0, 0, -13, 14, 0, 0, 0, -14, 0, 0
+	  2,   1, 0, 0
+	 -1,   3, 0, 0
+	  4,  -2, 0, 0
+	 -3,  -4, 0, 0
+	 -5,  -5, 0, 0
+	  7,   6, 0, 0
+	 -7,  -6, 0, 0
+	  8,   9, 0, 0
+	 -8,  -9, 0, 0
+	 11,  10, 0, 0
+	 12,   0, 0, 0
+	-11, -10, 0, 0
+	-12,   0, 0, 0
+	  0,  13, 0, 0
+	-13,  14, 0, 0
+	  0, -14, 0, 0
 end table
 
 private table TransportTube_transportTables1[12]
@@ -636,6 +648,7 @@ event ObjectUpdate
 							end if
 
 							if temp0 >= 0x800000
+								// We're entering the tube
 								if object.transportPath != 2
 									temp3 = object.transportPath
 								else
@@ -643,6 +656,7 @@ event ObjectUpdate
 									temp3 &= 1
 								end if
 							else
+								// We're about to exit the tube
 								temp1 = player[currentPlayer].ypos
 								temp1 -= object.ypos
 								if temp1 >= 0x400000
@@ -651,6 +665,7 @@ event ObjectUpdate
 									temp3 = 3
 								end if
 							end if
+							
 							object[arrayPos0].transportPath = temp3
 
 							temp3 += object.tubetype
@@ -726,7 +741,12 @@ event ObjectUpdate
 				if object.transportPath >= 4
 					object.state = TRANSPORTTUBE_EXITNODE
 					player[currentPlayer].ypos &= 0x7FF0000
+#platform: USE_STANDALONE
 					player[currentPlayer].state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+					player[currentPlayer].state = Player_State_Air_NoDropDash
+#endplatform
 					player[currentPlayer].tileCollisions = true
 					player[currentPlayer].interaction = true
 					player[currentPlayer].xvel = 0
@@ -735,7 +755,7 @@ event ObjectUpdate
 					PlaySfx(SfxName[Release], false)
 				else
 					temp0 = object.propertyValue
-					temp0 &= 0xFC
+					temp0 &= 0xFC // (~3)
 					temp0 += object.transportPath
 					object.transportPath = 4
 
@@ -743,7 +763,12 @@ event ObjectUpdate
 					if temp1 == 0
 						object.state = TRANSPORTTUBE_EXITNODE
 						player[currentPlayer].ypos &= 0x7FF0000
+#platform: USE_STANDALONE
 						player[currentPlayer].state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+						player[currentPlayer].state = Player_State_Air_NoDropDash
+#endplatform
 						player[currentPlayer].tileCollisions = true
 						player[currentPlayer].interaction = true
 						player[currentPlayer].xvel = 0
@@ -828,7 +853,12 @@ event ObjectUpdate
 			if object.transportDelay == 0
 				object.state = TRANSPORTTUBE_EXITNODE
 				player[currentPlayer].ypos &= 0x7FF0000
+#platform: USE_STANDALONE
 				player[currentPlayer].state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+				player[currentPlayer].state = Player_State_Air_NoDropDash
+#endplatform
 				player[currentPlayer].tileCollisions = true
 				player[currentPlayer].interaction = true
 				player[currentPlayer].xvel = 0
@@ -902,7 +932,7 @@ event ObjectStartup
 	SetTableValue(TransportTube_transportPath2_11, 12, TransportTube_transportTables2)
 	SetTableValue(TransportTube_transportPath2_12, 13, TransportTube_transportTables2)
 	SetTableValue(TransportTube_transportPath2_13, 14, TransportTube_transportTables2)
-
+	
 	foreach (TypeName[Transport Tube], arrayPos0, ALL_ENTITIES)
 		if object[arrayPos0].propertyValue == 0xFF
 			object[arrayPos0].state = TRANSPORTTUBE_BLANK

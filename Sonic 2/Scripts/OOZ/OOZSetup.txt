@@ -34,6 +34,7 @@ private alias object.state : player.state
 private alias object.xpos : player.xpos
 private alias object.ypos : player.ypos
 private alias object.iypos : player.iypos
+private alias object.xvel : player.xvel
 private alias object.yvel : player.yvel
 private alias object.speed : player.speed
 private alias object.drawOrder : player.drawOrder
@@ -166,7 +167,12 @@ private function OOZSetup_PlayerState_OilPool
 
 	CallFunction(Player_HandleGroundMovement)
 	if player.gravity == GRAVITY_AIR
+#platform: USE_STANDALONE
 		player.state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+		player.state = Player_State_Air_NoDropDash
+#endplatform
 		CallFunction(Player_HandleAirMovement)
 	else
 		CallFunction(Player_HandleOnGround)
@@ -177,7 +183,7 @@ private function OOZSetup_PlayerState_OilPool
 					player.timer++
 				else
 					player.animation = ANI_WAITING
-					if stage.playerListPos == PLAYER_KNUX_ALONE
+					if stage.playerListPos == PLAYER_KNUCKLES_A
 						player.timer++
 						if player.timer == 834
 							player.timer = 0
@@ -367,7 +373,12 @@ private function OOZSetup_PlayerState_OilSlide
 	CallFunction(OOZSetup_HandleOilMovement)
 
 	if player.gravity == GRAVITY_AIR
+#platform: USE_STANDALONE
 		player.state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+		player.state = Player_State_Air_NoDropDash
+#endplatform
 		CallFunction(Player_HandleAirMovement)
 	else
 		CallFunction(Player_HandleOnGround)
@@ -378,7 +389,7 @@ private function OOZSetup_PlayerState_OilSlide
 					player.timer++
 				else
 					player.animation = ANI_WAITING
-					if stage.playerListPos == PLAYER_KNUX_ALONE
+					if stage.playerListPos == PLAYER_KNUCKLES_A
 						player.timer++
 						if player.timer == 834
 							player.timer = 0
@@ -421,6 +432,44 @@ private function OOZSetup_PlayerState_OilSlide
 		if player.jumpPress == true
 			CallFunction(Player_Action_Jump)
 		end if
+#platform: USE_ORIGINS
+		switch player.collisionMode
+		case CMODE_LWALL
+			if player.angle <= 192
+				if player.speed > -0x20000
+					if player.speed < 0x20000
+						player.gravity = GRAVITY_AIR
+						player.angle = 0
+						player.collisionMode = CMODE_FLOOR
+						player.speed = player.xvel
+					end if
+				end if
+			end if
+			break
+		case CMODE_ROOF
+			if player.speed > -0x20000
+				if player.speed < 0x20000
+					player.gravity = GRAVITY_AIR
+					player.angle = 0
+					player.collisionMode = CMODE_FLOOR
+					player.speed = player.xvel
+				end if
+			end if
+			break
+		case CMODE_RWALL
+			if player.angle >= 64
+				if player.speed > -0x20000
+					if player.speed < 0x20000
+						player.gravity = GRAVITY_AIR
+						player.angle = 0
+						player.collisionMode = CMODE_FLOOR
+						player.speed = player.xvel
+					end if
+				end if
+			end if
+			break
+		end switch
+#endplatform
 	end if
 end function
 
@@ -432,7 +481,7 @@ private function OOZSetup_SpeedUpMusic
 	temp0 &= checkResult
 	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
 	temp0 &= checkResult
-	if temp0 == 0
+	if temp0 == false
 		switch music.currentTrack
 		case TRACK_STAGE
 			SetMusicTrack("Invincibility_F.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV_F)
@@ -465,7 +514,7 @@ private function OOZSetup_SlowDownMusic
 	temp0 &= checkResult
 	CheckEqual(stage.musicFlag, MUSICEVENT_FLAG_NOCHANGE)
 	temp0 &= checkResult
-	if temp0 == 0
+	if temp0 == false
 		switch music.currentTrack
 		case TRACK_STAGE
 			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
@@ -599,8 +648,12 @@ event ObjectUpdate
 		if player[currentPlayer].state == Player_State_Static
 			if player[currentPlayer].ypos < -0x800000
 				// If the Player's up in the sky while static they were likely sent there by a Ball Cannon, so return them to normal now
-				
+#platform: USE_STANDALONE
 				player[currentPlayer].state = Player_State_Air
+#endplatform
+#platform: USE_ORIGINS
+				player[currentPlayer].state = Player_State_Air_NoDropDash
+#endplatform
 				player[currentPlayer].gravity = GRAVITY_AIR
 				player[currentPlayer].jumpAbilityState = 0
 				player[currentPlayer].tileCollisions = true
@@ -694,7 +747,7 @@ event ObjectStartup
 	animalType1 = TypeName[Rocky]
 	animalType2 = TypeName[Pecky]
 
-	// This is resetting the boss flash colour, [OOZ Eggman] does this too though so it's somewhat redundant
+	// This is resetting the boss flash color, [OOZ Eggman] does this too though so it's somewhat redundant
 	SetPaletteEntry(0, 192, 0x000000)
 
 	object[SLOT_ZONESETUP].type = TypeName[OOZ Setup]

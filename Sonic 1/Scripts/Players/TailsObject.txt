@@ -45,6 +45,8 @@ private alias object.value34 : player.collisionDisabled
 private alias object.value35 : player.jumpAbilityState
 private alias object.value42 : player.prevGravity
 
+// Reserved Object Slots
+private alias 1 : SLOT_PLAYER2
 
 // ========================
 // Function Declarations
@@ -57,6 +59,7 @@ reserve function TailsObject_ProcessTailSprite
 // Function Definitions
 // ========================
 
+// Note - function is used by [Player 2 Object] too
 public function TailsObject_ProcessTailSprite
 	switch player.tailAnim
 	case 0 // ANI_STOPPED
@@ -95,6 +98,10 @@ end function
 // ========================
 
 event ObjectUpdate
+#platform: USE_ORIGINS
+	currentPlayer = player.entityPos // Added here in Origins 2.0.2, fixes issues with Tails (see Player_HandleAirMovement in Player Object)
+#endplatform
+
 	if stage.debugMode == true
 		CallFunction(Player_ProcessUpdate)
 		
@@ -128,8 +135,8 @@ event ObjectUpdate
 				stage.state = STAGE_RUNNING
 			end if
 
-			if object[1].type == TypeName[Player 2 Object]
-				object[1].priority = PRIORITY_ACTIVE
+			if player[SLOT_PLAYER2].type == TypeName[Player 2 Object]
+				player[SLOT_PLAYER2].priority = PRIORITY_ACTIVE
 			end if
 
 			if object[+playerCount].propertyValue == 3

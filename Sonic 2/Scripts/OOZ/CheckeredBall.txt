@@ -55,7 +55,7 @@ private alias object.value0 : monitor.contentsPos.y
 private alias object.value1 : monitor.timer
 
 // Spring Aliases
-private alias object.value0 : spring.timer 
+private alias object.value0 : spring.timer
 private alias object.value1 : spring.active
 private alias object.value2 : spring.extraVelocity
 
@@ -1151,6 +1151,7 @@ event ObjectUpdate
 					end if
 				end if
 				break
+				
 			end switch // object[arrayPos0].state
 			break
 			

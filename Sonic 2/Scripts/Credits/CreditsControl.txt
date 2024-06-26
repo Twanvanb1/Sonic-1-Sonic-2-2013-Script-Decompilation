@@ -94,10 +94,10 @@ event ObjectUpdate
 				screen.yoffset += 256
 			else
 				object.state = CREDITSCONTROL_FADEIN
-				if specialStage.emeralds >= 127
+				if specialStage.emeralds >= 0x7F
 					if object.timer2 == 21
 						screen.yoffset = 5120
-						screen.yoffset += 1036
+						screen.yoffset += 1036 // strange way to do it, but alright
 					else
 						screen.yoffset += 256
 					end if
@@ -174,10 +174,8 @@ end event
 
 event ObjectStartup
 	SetMusicTrack("Credits.ogg", 0, false)
-
 	options.touchControls 	= false
 	screen.yoffset 			= -8
-
 	foreach (TypeName[Credits Control], arrayPos0, ALL_ENTITIES)
 		object[arrayPos0].priority = PRIORITY_ACTIVE
 	next

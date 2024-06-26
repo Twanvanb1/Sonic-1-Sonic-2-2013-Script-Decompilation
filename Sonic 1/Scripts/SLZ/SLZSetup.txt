@@ -16,7 +16,7 @@ private alias object.value2 : object.scrollPos
 // Tracks
 private alias 0 : TRACK_STAGE
 private alias 2 : TRACK_INVINCIBLE
-private alias 2 : TRACK_BOSS
+private alias 4 : TRACK_BOSS
 
 // Reserved object slots
 private alias 10 : SLOT_ZONESETUP
@@ -185,6 +185,7 @@ end event
 
 event ObjectDraw
 	// Draw FG Construction Sprites
+	// (Even if Forever allows for wider screen sizes, it doesn't actually update this code for that, which is why the giders just appear and disappear)
 	temp0 = screen.xoffset
 	temp0 <<= 1
 	temp0 &= 511
